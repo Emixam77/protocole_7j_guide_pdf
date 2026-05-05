@@ -1,11 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Optional
 from .agents import AgentSourcing, AgentCommunity, AgentAdsIntel
 from .database import get_supabase
+from .mailer import send_delivery_email
 import os
+import stripe
 
 app = FastAPI(title="Protocole 7 Jours API")
 
@@ -59,10 +61,34 @@ async def get_radar_signals():
     agent = AgentCommunity()
     return agent.detect_distress()
 
-@app.get("/user/progress/{user_id}")
-async def get_progress(user_id: str):
-    supabase = get_supabase()
-    result = supabase.table("user_activity").select("*").eq("user_id", user_id).single().execute()
-    if not result.data:
-        raise HTTPException(status_code=404, detail="User not found")
-    return result.data
+# Configuration Stripe
+stripe.api_key = os.getenv("STRIPE_API_KEY")
+webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+@app.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+
+    if not sig_header:
+        raise HTTPException(status_code=400, detail="Missing stripe-signature header")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError as e:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        customer_email = session.get('customer_details', {}).get('email')
+        
+        if customer_email:
+            print(f"Paiement réussi pour {customer_email}. Envoi du guide...")
+            send_delivery_email(customer_email)
+
+    return {"status": "success"}
+

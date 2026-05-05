@@ -45,8 +45,4 @@ ALTER TABLE public.upsell_matrix ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can only see their own leads" ON public.leads_prospects
     FOR ALL USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can only see their own activity" ON public.user_activity
-    FOR ALL USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can only see their own upsells" ON public.upsell_matrix
-    FOR ALL USING (auth.uid() = user_id);

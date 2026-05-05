@@ -4,3 +4,5 @@ supabase
 requests
 python-dotenv
 pydantic
+stripe
+python-multipart

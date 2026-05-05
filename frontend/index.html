@@ -3,133 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protocole 7 Jours | Opération Signature</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>OPÉRATION PREMIER CONTRAT | Dossier Confidentiel</title>
+    <link rel="stylesheet" href="landing.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Login Modal -->
-    <div id="login-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 2000; display: flex; align-items: center; justify-content: center;">
-        <div class="card" style="width: 100%; max-width: 400px; padding: 3rem;">
-            <h2 style="margin-bottom: 2rem; text-align: center;">AUTHENTIFICATION</h2>
-            <form id="login-form">
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 0.5rem;">EMAIL_ID</label>
-                    <input type="email" id="email" required style="width: 100%; background: none; border: var(--border-width) solid var(--border-color); color: #fff; padding: 0.8rem; font-family: var(--font-mono);">
-                </div>
-                <div style="margin-bottom: 2rem;">
-                    <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 0.5rem;">ACCESS_KEY</label>
-                    <input type="password" id="password" required style="width: 100%; background: none; border: var(--border-width) solid var(--border-color); color: #fff; padding: 0.8rem; font-family: var(--font-mono);">
-                </div>
-                <button type="submit" class="btn" style="width: 100%;">LANCER LA SESSION</button>
-            </form>
-            <p id="login-error" style="color: var(--danger-color); font-family: var(--font-mono); font-size: 0.7rem; margin-top: 1rem; text-align: center; display: none;">ERREUR: ACCÈS REFUSÉ</p>
-        </div>
+    <div class="bg-overlay"></div>
+
+    <!-- Floating CTA -->
+    <div class="floating-cta" id="floating-cta">
+        <a href="#payment" class="btn">ACCÉDER AU PROTOCOLE</a>
     </div>
 
-    <!-- Pitch Modal -->
-    <div id="pitch-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center;">
-        <div class="card" style="width: 100%; max-width: 500px; padding: 2rem;">
-            <h3 id="pitch-title" style="margin-bottom: 1rem;">🎯 PITCH COMMANDO</h3>
-            <textarea id="pitch-text" style="width: 100%; height: 200px; background: #111; border: 1px solid #333; color: #fff; padding: 1rem; font-family: var(--font-mono); margin-bottom: 1.5rem; resize: none;"></textarea>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn" id="btn-copy-pitch" style="flex-grow: 1;">COPIER SCRIPT</button>
-                <button class="btn" id="btn-close-pitch" style="background: none; border: 1px solid #333;">FERMER</button>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero visible">
+            <h1 class="glitch" data-text="VOTRE BOÎTIER PHOTO EST UNE MACHINE À CASH. IL LUI MANQUE JUSTE LE CODE.">VOTRE BOÎTIER PHOTO EST UNE MACHINE À CASH. IL LUI MANQUE JUSTE LE CODE.</h1>
+            <p>7 Jours pour identifier les failles du marché local, infiltrer les entreprises et signer votre premier contrat. Pas de site web. Pas d'abonnés. Juste de la stratégie.</p>
+            <div style="margin-bottom: 2rem;">
+                <img src="assets/guide_cover.jpg" alt="Protocole 7 Jours Guide" class="guide-cover">
             </div>
-        </div>
-    </div>
-
-    <div class="container" id="dashboard-content" style="display: none;">
-        <header>
-            <div class="logo">PROTOCOLE 7 JOURS</div>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <div class="status-badge">SESSION: <span id="user-display">---</span></div>
-                <button class="btn btn-sm" id="btn-logout" style="border-color: #333;">QUITTER</button>
-            </div>
-        </header>
-
-        <section class="timeline" id="timeline">
-            <div class="day-step" data-day="1">J-1: SOURCING</div>
-            <div class="day-step" data-day="2">J-2: CONTACT</div>
-            <div class="day-step" data-day="3">J-3: RELANCE</div>
-            <div class="day-step" data-day="4">J-4: AUDIT</div>
-            <div class="day-step" data-day="5">J-5: CLOSING</div>
-            <div class="day-step" data-day="6">J-6: ONBOARDING</div>
-            <div class="day-step" data-day="7">J-7: SIGNATURE</div>
+            <a href="#payment" class="btn">DÉPLOYER LE PROTOCOLE (27€)</a>
         </section>
 
-        <!-- Missions du Jour -->
-        <div class="card" id="missions-card" style="margin-bottom: 2rem; border-color: var(--accent-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h3 style="margin: 0; color: var(--accent-color);">⚡ MISSIONS DU JOUR <span id="current-day-display">1</span></h3>
-                <button class="btn btn-sm" id="btn-next-day" style="background: var(--accent-color); color: #000; border: none; font-weight: bold;">PASSER AU JOUR SUIVANT →</button>
-            </div>
-            <ul id="missions-list" style="list-style: none; padding: 0;">
-                <!-- Les missions seront injectées ici via app.js -->
-            </ul>
-        </div>
-
-        <main class="grid">
-            <div class="main-content">
-                <div class="card">
-                    <div style="margin-bottom: 1.5rem;">
-                        <h3 style="margin: 0 0 1rem 0;">🛰️ SOURCING: LEADS DÉTECTÉS</h3>
-                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            <select id="niche-select" class="btn btn-sm" style="background: none; text-align: left; flex-grow: 1;">
-                                <option value="Yoga" style="background: #000;">YOGA & BIEN-ÊTRE</option>
-                                <option value="Clinique Esthétique" style="background: #000;">CLINIQUE & SPA</option>
-                                <option value="Artisanat" style="background: #000;">ARTISANAT PREMIUM</option>
-                                <option value="Menuiserie" style="background: #000;">MENUISERIE / ÉBÉNISTERIE</option>
-                                <option value="Garage" style="background: #000;">GARAGE PASSION</option>
-                                <option value="CrossFit" style="background: #000;">CROSSFIT & FITNESS</option>
-                                <option value="Coworking" style="background: #000;">COWORKING & SHOWROOM</option>
-                                <option value="Camping" style="background: #000;">HÔTELLERIE PLEIN AIR</option>
-                            </select>
-                            <input type="text" id="city-input" placeholder="VILLE" value="Paris" style="background: none; border: var(--border-width) solid var(--border-color); color: #fff; padding: 0.4rem; font-family: var(--font-mono); width: 80px;">
-                            <button class="btn btn-sm" id="btn-scan">SCANNER</button>
-                        </div>
+        <!-- Section The Gap -->
+        <section class="gap-section">
+            <h2 class="glitch" data-text="LE MARCHÉ EST SATURÉ D'ARTISTES.">LE MARCHÉ EST SATURÉ D'ARTISTES.</h2>
+            <div class="split-layout">
+                <div class="split-text">
+                    <div style="margin-top: 0;">
+                        <blockquote>
+                            "Le marché de la photo est saturé d'artistes qui attendent que le téléphone sonne. Pendant ce temps, des milliers d'entreprises perdent des clients à cause d'images médiocres."
+                        </blockquote>
                     </div>
-                    <ul class="lead-list" id="leads-container">
-                        <!-- Les leads seront injectés ici -->
-                        <li class="lead-item" style="opacity: 0.5;">
-                            <div><em>Sélectionnez une niche et lancez le scan...</em></div>
-                        </li>
-                    </ul>
                 </div>
-
-                <div class="card" style="margin-top: 2rem;">
-                    <h3>📈 INTELLIGENCE ADS</h3>
-                    <p style="font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.8;">
-                        > ANALYSE DES HOOKS CONCURRENTS EN COURS...<br>
-                        > ANGLE DÉTECTÉ: "ANTI-INSTAGRAM"<br>
-                        > RECOMMANDATION: UTILISER LE HOOK "LA MÉTHODE INVISIBLE" POUR MAXIMISER LE CTR.
-                    </p>
+                <div class="split-image">
+                    <img src="assets/the_gap_lens.jpg" alt="Objectif Tactique">
                 </div>
             </div>
+        </section>
 
-            <aside class="sidebar">
-                <div class="card">
-                    <h3>👂 RADAR NEXUS</h3>
-                    <div class="radar"></div>
-                    <p style="margin-top: 1rem; font-family: var(--font-mono); font-size: 0.8rem;">
-                        <span style="color: var(--danger-color)">●</span> SIGNAL DÉTECTÉ SUR REDDIT/PHOTOPRO<br>
-                        "Comment trouver des clients sans budget pub ?"
-                    </p>
-                    <button class="btn" style="width: 100%; margin-top: 1rem;">INTERVENIR</button>
+        <!-- Section Graphecet -->
+        <section class="plan-section">
+            <h2 class="glitch" data-text="LA MÉTHODE : GRAPHECET J1-J7">LA MÉTHODE : GRAPHECET J1-J7</h2>
+            <p style="text-align: center; color: var(--accent-color); font-family: var(--font-mono); font-size: 0.8rem; margin-top: -1rem; margin-bottom: 2rem;">ce que vous révèlera ce guide</p>
+            <div class="plan-grid">
+                <div class="day-card active" data-day="1">
+                    <span class="day-number">J1</span>
+                    <span style="font-size: 0.6rem;">INFILTRATION</span>
                 </div>
+                <div class="day-card" data-day="2">
+                    <span class="day-number">J2</span>
+                    <span style="font-size: 0.6rem;">SOURCING IA</span>
+                </div>
+                <div class="day-card" data-day="3">
+                    <span class="day-number">J3</span>
+                    <span style="font-size: 0.6rem;">L'AUDIT</span>
+                </div>
+                <div class="day-card" data-day="4">
+                    <span class="day-number">J4</span>
+                    <span style="font-size: 0.6rem;">PITCH</span>
+                </div>
+                <div class="day-card" data-day="5">
+                    <span class="day-number">J5</span>
+                    <span style="font-size: 0.6rem;">CLOSING</span>
+                </div>
+                <div class="day-card" data-day="6">
+                    <span class="day-number">J6</span>
+                    <span style="font-size: 0.6rem;">LUMIÈRE</span>
+                </div>
+                <div class="day-card" data-day="7">
+                    <span class="day-number">J7</span>
+                    <span style="font-size: 0.6rem;">SIGNATURE</span>
+                </div>
+            </div>
+            <div class="teaser-box">
+                <div id="teaser-content">JOUR 1 : INFILTRATION. Scanner votre zone et identifier les 10 cibles avec le plus gros 'Gap' de valeur.</div>
+            </div>
+        </section>
 
-                <div class="card" style="margin-top: 2rem;">
-                    <h3>📖 GUIDE J-3</h3>
-                    <p>Ta mission aujourd'hui : Contacter 5 leads avec le script "Gap Detection".</p>
-                    <a href="#" class="btn btn-sm" style="display: block; text-align: center; margin-top: 1rem;">VOIR LE GUIDE (PDF)</a>
+        <!-- Section Nexus IA -->
+        <section class="nexus-section">
+            <h2 class="glitch" data-text="L'AVANTAGE TECHNOLOGIQUE">L'AVANTAGE TECHNOLOGIQUE</h2>
+            <div class="split-layout">
+                <div class="split-image">
+                    <img src="assets/nexus_radar.jpg" alt="Radar Nexus">
                 </div>
-            </aside>
-        </main>
+                <div class="split-text">
+                    <p style="font-size: 1.2rem; color: var(--accent-color);">"Pourquoi chercher quand on peut détecter ?"</p>
+                    <p style="margin-top: 1rem; color: #888;">L'interface Nexus scanne les failles visuelles de votre ville et vous livre les leads les plus chauds sur un plateau.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section FAQ -->
+        <section class="faq-section">
+            <h2 class="glitch" data-text="VOS QUESTIONS FRÉQUENTES">VOS QUESTIONS FRÉQUENTES</h2>
+            <div style="margin-top: 3rem;">
+                <div class="faq-item">
+                    <h3>Q : Je suis totalement débutant, est-ce que ça va marcher ?</h3>
+                    <p>R : Absolument. Le protocole est conçu pour ceux qui partent de zéro. On ne vous demande pas d'avoir un nom, mais d'avoir une méthode de chasse que les autres n'ont pas.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Q : Quel matériel photo est nécessaire ?</h3>
+                    <p>R : Un boîtier reflex ou hybride basique suffit. Si vous savez maîtriser la lumière (on vous l'apprend au Jour 6), le matériel devient secondaire.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Q : Combien de temps par jour dois-je y consacrer ?</h3>
+                    <p>R : Comptez environ 1h30 à 2h par jour. C'est une mission commando, pas un marathon. Chaque minute est investie dans une action concrète de vente.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Q : L'interface Nexus est-elle incluse à vie ?</h3>
+                    <p>R : Votre achat de 27€ vous donne accès au protocole complet et à une période de test de l'interface Nexus pour lancer vos premiers scans.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Q : Et si je ne trouve pas de clients ?</h3>
+                    <p>R : C'est simple : si vous appliquez les 7 jours et que vous n'obtenez aucun rendez-vous, envoyez-nous un email. On vous rembourse sans poser de questions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Bonus / Order Bump -->
+        <section class="bonus-section">
+            <div class="bonus-box">
+                <div class="bonus-header">
+                    <span class="badge">URGENT</span>
+                    <h2 class="glitch" data-text="CADEAU : L’ARSENAL LÉGAL & ADMINISTRATIF">CADEAU : L’ARSENAL LÉGAL & ADMINISTRATIF</h2>
+                    <p class="value">Valeur 47€ — <span class="free">OFFERT</span></p>
+                </div>
+                <div class="bonus-body">
+                    <p>Il me reste <span class="licenses-count">14</span> licences gratuites pour ce pack aujourd'hui. Je l'offre aux 100 premiers acheteurs du Protocole pour m'assurer que vous lanciez votre business sur des bases saines.</p>
+                    <div class="bonus-checkbox-container">
+                        <input type="checkbox" id="bonus-check" name="bonus-check" checked>
+                        <label for="bonus-check">OUI, je veux sécuriser mon activité et recevoir les contrats & modèles de factures GRATUITEMENT avec ma commande.</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA / Payment -->
+        <section id="payment" class="payment-card-section">
+            <h2 class="glitch" data-text="PRÊT POUR L'EXTRACTION ?">PRÊT POUR L'EXTRACTION ?</h2>
+            <p class="subtitle-yellow">Procurez vous le guide pour avoir un contrat payant en photo en 7 jours</p>
+            
+            <div class="summary-box">
+                <ul class="summary-list">
+                    <li><span class="item">Protocole Commando "Premier Contrat"</span> <span class="val">47€</span></li>
+                    <li><span class="item">Licence Nexus IA (Période d'essai)</span> <span class="val">35€</span></li>
+                    <li><span class="item">Arsenal Légal & Administratif</span> <span class="val">15€</span></li>
+                </ul>
+                <div class="total-value">Valeur Totale : <span class="old-price">97€</span></div>
+                <div class="final-price">VOTRE ACCÈS : <span class="price-tag">27€</span></div>
+            </div>
+
+            <form id="contact-form" style="max-width: 400px; margin: 2rem auto 0;">
+                <input type="email" id="contact-email" placeholder="VOTRE_EMAIL_ID" required style="width: 100%; background: transparent; border: 1px solid var(--border-color); padding: 1rem; color: #fff; font-family: var(--font-mono); margin-bottom: 1rem;">
+                <button type="submit" class="btn" style="width: 100%;" id="pay-btn">DÉPLOYER LE PROTOCOLE (27€)</button>
+            </form>
+            <p style="margin-top: 1rem; font-size: 0.7rem; color: #444;">SECURE_PAYMENT_ENCRYPTION: AES-256</p>
+        </section>
     </div>
 
-    <script src="app.js"></script>
+    <script src="landing.js"></script>
 </body>
 </html>
