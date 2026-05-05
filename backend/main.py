@@ -82,10 +82,9 @@ async def stripe_webhook(request: Request):
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         
-        # Conversion forcée en dictionnaire pour éviter les erreurs d'attributs Stripe
-        session_dict = dict(session)
-        customer_details = session_dict.get('customer_details', {})
-        customer_email = customer_details.get('email') if customer_details else None
+        # Extraction ultra-sécurisée de l'email (méthode getattr en cascade)
+        customer_details = getattr(session, 'customer_details', None)
+        customer_email = getattr(customer_details, 'email', None) if customer_details else None
         
         if customer_email:
             print(f"Paiement réussi pour {customer_email}. Envoi du guide...")
