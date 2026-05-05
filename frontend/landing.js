@@ -80,8 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
         payBtn.innerText = "INITIALISATION PAIEMENT...";
         payBtn.disabled = true;
 
-        // On redirige vers Stripe avec l'email pré-rempli (LIEN DE TEST)
-        const stripeUrl = `https://buy.stripe.com/test_8x214m3Ku0Gq5Li7sM18c01?prefilled_email=${encodeURIComponent(email)}`;
+        // On redirige vers Stripe avec l'email pré-rempli
+        const stripeUrl = `https://buy.stripe.com/8x28wOch088SgpWcN618c0f?prefilled_email=${encodeURIComponent(email)}`;
         
         setTimeout(() => {
             window.location.href = stripeUrl;
