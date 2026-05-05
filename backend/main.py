@@ -20,10 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Servir le frontend (uniquement si le dossier existe)
-frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
-if os.path.exists(frontend_path):
-    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+
 
 class SourcingRequest(BaseModel):
     user_id: str
@@ -91,4 +88,9 @@ async def stripe_webhook(request: Request):
             send_delivery_email(customer_email)
 
     return {"status": "success"}
+
+# Servir le frontend en dernier recours (pour éviter de bloquer les routes API)
+frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
 
