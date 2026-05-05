@@ -27,9 +27,6 @@ class SourcingRequest(BaseModel):
     niche: str
     city: str
 
-@app.get("/")
-async def root():
-    return {"message": "Protocole 7 Jours Backend Active"}
 
 @app.post("/scan/leads")
 async def scan_leads(req: SourcingRequest):
