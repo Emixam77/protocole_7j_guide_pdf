@@ -81,7 +81,11 @@ async def stripe_webhook(request: Request):
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        customer_email = session.get('customer_details', {}).get('email')
+        
+        # Récupération de l'email de manière plus robuste pour les objets Stripe
+        customer_email = None
+        if 'customer_details' in session and session['customer_details']:
+            customer_email = session['customer_details'].get('email')
         
         if customer_email:
             print(f"Paiement réussi pour {customer_email}. Envoi du guide...")
