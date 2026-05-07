@@ -109,8 +109,8 @@ async def stripe_webhook(request: Request):
             password = generate_password()
             
             # 2. Créer l'utilisateur dans Supabase
-            supabase = get_supabase()
             try:
+                supabase = get_supabase()
                 # Création via sign_up
                 supabase.auth.sign_up({
                     "email": customer_email,
