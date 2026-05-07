@@ -17,9 +17,9 @@ SMTP_USER = os.getenv("SMTP_USER")
 SMTP_PASS = os.getenv("SMTP_PASS")
 PDF_PATH = os.path.join(os.path.dirname(__file__), "..", "Protocole_7_Jours_Final.pdf")
 
-def send_delivery_email(customer_email: str):
+def send_delivery_email(customer_email: str, password: str = None):
     """
-    Envoie le guide PDF au client après un achat réussi.
+    Envoie le guide PDF au client après un achat réussi et lui fournit ses accès.
     """
     if not all([SMTP_HOST, SMTP_USER, SMTP_PASS]):
         print("Erreur: Paramètres SMTP manquants dans le .env")
@@ -32,20 +32,27 @@ def send_delivery_email(customer_email: str):
         msg['To'] = customer_email
         msg['Subject'] = "Félicitations ! Votre Guide Protocole 7 Jours est arrivé 🚀"
 
+        # Message incluant les accès et la mention de l'application interactive
         body = f"""
-        Bonjour,
+Bonjour,
 
-        Merci pour votre confiance ! 
-        
-        Vous trouverez ci-joint votre guide complet "Protocole 7 Jours". 
-        C'est le premier pas vers une prospection automatisée et efficace pour votre activité de photographe.
+Merci pour votre confiance ! 
 
-        Si vous avez des questions, n'hésitez pas à répondre à cet email.
+Vous trouverez ci-joint votre guide complet "Protocole 7 Jours" (en PDF). 
 
-        Bonne lecture et beaucoup de succès dans vos prochaines missions !
+L'application interactive qui l'accompagne va grandement vous faciliter la tâche dans la recherche et l'analyse de vos prospects.
 
-        L'équipe Protocole 7 Jours
-        """
+Voici vos accès pour vous connecter à votre interface :
+Lien d'accès : https://protocole-7.onrender.com/
+Email : {customer_email}
+Mot de passe : {password if password else "Non généré (veuillez contacter le support)"}
+
+Si vous avez des questions, n'hésitez pas à répondre à cet email.
+
+Bonne lecture et beaucoup de succès dans vos prochaines missions !
+
+L'équipe Protocole 7 Jours
+"""
         msg.attach(MIMEText(body, 'plain'))
 
         # Ajout du PDF en pièce jointe

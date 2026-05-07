@@ -8,6 +8,10 @@ from .database import get_supabase
 from .mailer import send_delivery_email
 import os
 import stripe
+import requests
+import random
+import string
+from .database import get_supabase
 
 app = FastAPI(title="Protocole 7 Jours API")
 
@@ -55,9 +59,24 @@ async def get_radar_signals():
     agent = AgentCommunity()
     return agent.detect_distress()
 
-# Configuration Stripe
+# Configuration Stripe et Telegram
 stripe.api_key = os.getenv("STRIPE_API_KEY")
 webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+def generate_password(length=8):
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for i in range(length))
+
+def send_telegram_alert(email):
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
+        message = f"🚨 Nouvelle Vente Protocole 7 Jours ! 🚨\n\nEmail: {email}\nL'accès au Dashboard a été créé."
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        try:
+            requests.post(url, json={"chat_id": TELEGRAM_CHAT_ID, "text": message})
+        except Exception as e:
+            print(f"Erreur Telegram: {e}")
 
 @app.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
@@ -84,8 +103,28 @@ async def stripe_webhook(request: Request):
         customer_email = getattr(customer_details, 'email', None) if customer_details else None
         
         if customer_email:
-            print(f"Paiement réussi pour {customer_email}. Envoi du guide...")
-            send_delivery_email(customer_email)
+            print(f"Paiement réussi pour {customer_email}. Création de compte et envoi du guide...")
+            
+            # 1. Générer un mot de passe
+            password = generate_password()
+            
+            # 2. Créer l'utilisateur dans Supabase
+            supabase = get_supabase()
+            try:
+                # Création via sign_up
+                supabase.auth.sign_up({
+                    "email": customer_email,
+                    "password": password
+                })
+                print(f"Compte Supabase créé pour {customer_email}")
+            except Exception as e:
+                print(f"Erreur lors de la création du compte Supabase: {e}")
+                
+            # 3. Envoyer l'email avec le PDF et les accès
+            send_delivery_email(customer_email, password)
+            
+            # 4. Alerte Telegram
+            send_telegram_alert(customer_email)
 
     return {"status": "success"}
 
