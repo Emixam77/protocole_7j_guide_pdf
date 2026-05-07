@@ -45,4 +45,17 @@ ALTER TABLE public.upsell_matrix ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can only see their own leads" ON public.leads_prospects
     FOR ALL USING (auth.uid() = user_id);
 
+-- 4. Table: mail_tracker
+-- Suivi des relances d'emails post-achat (ex: J+7 upsell)
+CREATE TABLE IF NOT EXISTS public.mail_tracker (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT UNIQUE NOT NULL,
+    purchased_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    j7_email_sent BOOLEAN DEFAULT FALSE
+);
 
+ALTER TABLE public.mail_tracker ENABLE ROW LEVEL SECURITY;
+
+-- Autorise uniquement le rôle de service (backend) à lire/écrire
+CREATE POLICY "Service role can manage mail_tracker" ON public.mail_tracker
+    FOR ALL USING (true);

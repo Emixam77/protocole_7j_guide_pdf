@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -11,7 +11,6 @@ import stripe
 import requests
 import random
 import string
-from .database import get_supabase
 
 app = FastAPI(title="Protocole 7 Jours API")
 
@@ -108,7 +107,7 @@ async def stripe_webhook(request: Request):
             # 1. Générer un mot de passe
             password = generate_password()
             
-            # 2. Créer l'utilisateur dans Supabase
+            # 2. Créer l'utilisateur dans Supabase et initialiser le mail tracker
             try:
                 supabase = get_supabase()
                 # Création via sign_up
@@ -117,8 +116,15 @@ async def stripe_webhook(request: Request):
                     "password": password
                 })
                 print(f"Compte Supabase créé pour {customer_email}")
+                
+                # Ajouter au mail tracker pour la relance J+7
+                supabase.table('mail_tracker').insert({
+                    "email": customer_email
+                }).execute()
+                print(f"Ajout au mail_tracker pour {customer_email}")
+                
             except Exception as e:
-                print(f"Erreur lors de la création du compte Supabase: {e}")
+                print(f"Erreur Supabase (auth/tracker): {e}")
                 
             # 3. Envoyer l'email avec le PDF et les accès
             send_delivery_email(customer_email, password)
@@ -127,6 +133,12 @@ async def stripe_webhook(request: Request):
             send_telegram_alert(customer_email)
 
     return {"status": "success"}
+
+@app.get("/cron/mail-tracker")
+async def trigger_mail_tracker(background_tasks: BackgroundTasks):
+    from .agents.agent_mail_tracker import process_j7_emails
+    background_tasks.add_task(process_j7_emails)
+    return {"status": "Processing started in background"}
 
 # Servir le frontend en dernier recours (pour éviter de bloquer les routes API)
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
